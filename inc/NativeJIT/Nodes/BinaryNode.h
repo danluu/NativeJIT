@@ -27,6 +27,7 @@
 #include "NativeJIT/CodeGenHelpers.h"
 #include "NativeJIT/Nodes/Node.h"
 
+#include <type_traits>
 
 namespace NativeJIT
 {
@@ -70,7 +71,8 @@ namespace NativeJIT
     }
 
 
-    template <OpCode OP, typename L, typename R>
+    template <OpCode OP, typename L, typename R, 
+        typename std::enable_if_t<std::is_same<L, R>>>
     typename ExpressionTree::Storage<L> BinaryNode<OP, L, R>::CodeGenValue(ExpressionTree& tree)
     {
         Storage<L> sLeft;
@@ -79,6 +81,30 @@ namespace NativeJIT
         this->CodeGenInPreferredOrder(tree,
                                       m_left, sLeft,
                                       m_right, sRight);
+
+        if (sLeft == sRight)
+        {
+            CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(true), sRight);
+        }
+        else
+        { 
+            CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(true), sRight);
+        }
+
+        return sLeft;
+    }
+
+
+    template <OpCode OP, typename L, typename R>
+    typename ExpressionTree::Storage<L> BinaryNode<OP, L, R>::CodeGenValue(ExpressionTree& tree)
+    {
+        Storage<L> sLeft;
+        Storage<R> sRight;
+
+        this->CodeGenInPreferredOrder(tree,
+            m_left, sLeft,
+            m_right, sRight);
+
 
         CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(true), sRight);
 
