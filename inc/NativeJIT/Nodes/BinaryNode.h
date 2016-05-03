@@ -72,7 +72,7 @@ namespace NativeJIT
 
 
     template <OpCode OP, typename L, typename R, 
-        typename std::enable_if_t<std::is_same<L, R>>>
+        typename std::enable_if_t<std::is_same<L, R>::value>>
     typename ExpressionTree::Storage<L> BinaryNode<OP, L, R>::CodeGenValue(ExpressionTree& tree)
     {
         Storage<L> sLeft;
