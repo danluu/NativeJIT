@@ -70,7 +70,7 @@ namespace NativeJIT
         right.IncrementParentCount();
     }
 
-
+/*
     template <OpCode OP, typename L, typename R, 
         typename std::enable_if_t<std::is_same<L, R>::value>>
     typename ExpressionTree::Storage<L> BinaryNode<OP, L, R>::CodeGenValue(ExpressionTree& tree)
@@ -93,7 +93,7 @@ namespace NativeJIT
 
         return sLeft;
     }
-
+*/
 
     template <OpCode OP, typename L, typename R>
     typename ExpressionTree::Storage<L> BinaryNode<OP, L, R>::CodeGenValue(ExpressionTree& tree)
@@ -105,8 +105,15 @@ namespace NativeJIT
             m_left, sLeft,
             m_right, sRight);
 
-
-        CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(true), sRight);
+        #pragma warning( disable : 4127 )
+        if (std::is_same<L, R>::value && sLeft.m_data == sRight.m_data)
+        {
+            CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(true), sLeft);
+        }
+        else
+        {
+            CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(true), sRight);
+        }
 
         return sLeft;
     }

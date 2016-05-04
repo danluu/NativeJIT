@@ -556,6 +556,8 @@ namespace NativeJIT
         // and offset to the output stream.
         void Print(std::ostream& out) const;
 
+        ExpressionTree::Data* m_data; // TODO: move this back to private. This is a hack.
+
     private:
         // Types used to select the correct flavor of immediate methods. This is
         // necessary because GetStorageClass() is a runtime rather than a compile
@@ -580,8 +582,6 @@ namespace NativeJIT
 
         void PrintImmediate(std::ostream& out, ValidImmediateStorage) const;
         void PrintImmediate(std::ostream& out, InvalidImmediateStorage) const;
-
-        ExpressionTree::Data* m_data;
     };
 
 
