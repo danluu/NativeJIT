@@ -108,7 +108,14 @@ namespace NativeJIT
         #pragma warning( disable : 4127 )
         if (std::is_same<L, R>::value && sLeft.m_data == sRight.m_data)
         {
-            CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(true), sLeft);
+            if (sLeft.m_data->GetRefCount() == 2 && static_cast<int>(sLeft.m_data->GetStorageClass()) == 0) 
+            {
+                CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(false), sLeft);
+             }
+            else
+            {
+                CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(true), sLeft);
+            }
         }
         else
         {
