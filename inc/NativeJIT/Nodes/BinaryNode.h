@@ -76,7 +76,7 @@ namespace NativeJIT
     template <OpCode OP, typename L, typename R, typename std::enable_if<std::is_same<L, R>::value>::type * = nullptr>
     void BinaryNodeCodeGenHelper(FunctionBuffer& code, Storage<L>& sLeft, Storage<R>& sRight)
     {
-        if (sLeft.m_data == sRight.m_data)
+        if (sLeft == sRight)
         {
             sRight.Reset();
             CodeGenHelpers::Emit<OP>(code, sLeft.ConvertToDirect(true), sLeft);

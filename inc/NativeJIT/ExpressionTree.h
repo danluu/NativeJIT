@@ -904,12 +904,6 @@ namespace NativeJIT
     }
 
 
-    template <typename T, typename T2>
-    void ExpressionTree::Storage<T>::operator==(Storage<T2>& other) const
-    {
-        return false;
-    }
-
     //*************************************************************************
     //
     // template definitions for FreeList

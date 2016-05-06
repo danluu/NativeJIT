@@ -556,8 +556,10 @@ namespace NativeJIT
         // and offset to the output stream.
         void Print(std::ostream& out) const;
 
-        template<typename T2>
-        bool operator==(Storage<T2>& other) const;
+        bool operator==(Storage<T>const& other) const {
+            return this->m_data == other.m_data;
+        }
+
 
     private:
         // Types used to select the correct flavor of immediate methods. This is
