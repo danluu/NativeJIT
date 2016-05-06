@@ -70,30 +70,30 @@ namespace NativeJIT
         right.IncrementParentCount();
     }
 
-/*
-    template <OpCode OP, typename L, typename R, 
-        typename std::enable_if_t<std::is_same<L, R>::value>>
-    typename ExpressionTree::Storage<L> BinaryNode<OP, L, R>::CodeGenValue(ExpressionTree& tree)
+
+    // BinaryNodeCodeGenHelper exists to optimize the case where
+    // sLeft == sRight
+    template <OpCode OP, typename L, typename R, typename std::enable_if<std::is_same<L, R>::value>::type * = nullptr>
+    void BinaryNodeCodeGenHelper(FunctionBuffer& code, Storage<L>& sLeft, Storage<R>& sRight)
     {
-        Storage<L> sLeft;
-        Storage<R> sRight;
-
-        this->CodeGenInPreferredOrder(tree,
-                                      m_left, sLeft,
-                                      m_right, sRight);
-
-        if (sLeft == sRight)
+        if (sLeft.m_data == sRight.m_data)
         {
-            CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(true), sRight);
+            sRight.Reset();
+            CodeGenHelpers::Emit<OP>(code, sLeft.ConvertToDirect(true), sLeft);
         }
         else
-        { 
-            CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(true), sRight);
+        {
+            CodeGenHelpers::Emit<OP>(code, sLeft.ConvertToDirect(true), sRight);
         }
-
-        return sLeft;
     }
-*/
+
+
+    template <OpCode OP, typename L, typename R, typename std::enable_if<!std::is_same<L, R>::value>::type * = nullptr>
+    void BinaryNodeCodeGenHelper(FunctionBuffer& code, Storage<L>& sLeft, Storage<R>& sRight)
+    {
+        CodeGenHelpers::Emit<OP>(code, sLeft.ConvertToDirect(true), sRight);
+    }
+
 
     template <OpCode OP, typename L, typename R>
     typename ExpressionTree::Storage<L> BinaryNode<OP, L, R>::CodeGenValue(ExpressionTree& tree)
@@ -105,23 +105,7 @@ namespace NativeJIT
             m_left, sLeft,
             m_right, sRight);
 
-        #pragma warning( disable : 4127 )
-        if (std::is_same<L, R>::value && sLeft.m_data == sRight.m_data)
-        {
-            if (sLeft.m_data->GetRefCount() == 2 && static_cast<int>(sLeft.m_data->GetStorageClass()) == 0) 
-            {
-                CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(false), sLeft);
-             }
-            else
-            {
-                CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(true), sLeft);
-            }
-        }
-        else
-        {
-            CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(), sLeft.ConvertToDirect(true), sRight);
-        }
-
+        BinaryNodeCodeGenHelper<OP, L, R>(tree.GetCodeGenerator(), sLeft, sRight);
         return sLeft;
     }
 

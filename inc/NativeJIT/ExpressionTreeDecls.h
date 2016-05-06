@@ -556,7 +556,8 @@ namespace NativeJIT
         // and offset to the output stream.
         void Print(std::ostream& out) const;
 
-        ExpressionTree::Data* m_data; // TODO: move this back to private. This is a hack.
+        template<typename T2>
+        bool operator==(Storage<T2>& other) const;
 
     private:
         // Types used to select the correct flavor of immediate methods. This is
@@ -582,6 +583,8 @@ namespace NativeJIT
 
         void PrintImmediate(std::ostream& out, ValidImmediateStorage) const;
         void PrintImmediate(std::ostream& out, InvalidImmediateStorage) const;
+
+        ExpressionTree::Data* m_data;
     };
 
 
