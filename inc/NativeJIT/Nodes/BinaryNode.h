@@ -70,31 +70,6 @@ namespace NativeJIT
         right.IncrementParentCount();
     }
 
-
-    // BinaryNodeCodeGenHelper exists to optimize the case where
-    // sLeft == sRight
-    template <OpCode OP, typename L, typename R, typename std::enable_if<std::is_same<L, R>::value>::type * = nullptr>
-    void BinaryNodeCodeGenHelper(FunctionBuffer& code, Storage<L>& sLeft, Storage<R>& sRight)
-    {
-        if (sLeft == sRight)
-        {
-            sRight.Reset();
-            CodeGenHelpers::Emit<OP>(code, sLeft.ConvertToDirect(true), sLeft);
-        }
-        else
-        {
-            CodeGenHelpers::Emit<OP>(code, sLeft.ConvertToDirect(true), sRight);
-        }
-    }
-
-
-    template <OpCode OP, typename L, typename R, typename std::enable_if<!std::is_same<L, R>::value>::type * = nullptr>
-    void BinaryNodeCodeGenHelper(FunctionBuffer& code, Storage<L>& sLeft, Storage<R>& sRight)
-    {
-        CodeGenHelpers::Emit<OP>(code, sLeft.ConvertToDirect(true), sRight);
-    }
-
-
     template <OpCode OP, typename L, typename R>
     typename ExpressionTree::Storage<L> BinaryNode<OP, L, R>::CodeGenValue(ExpressionTree& tree)
     {
@@ -105,7 +80,20 @@ namespace NativeJIT
             m_left, sLeft,
             m_right, sRight);
 
-        BinaryNodeCodeGenHelper<OP, L, R>(tree.GetCodeGenerator(), sLeft, sRight);
+        // DESIGN NOTE: sLeft can == sRight when their types don't match. This can happen,
+        // although we (mhop & danluu) couldn't think of any useful cases where that
+        // currently happens.
+        if (sLeft == sRight)
+        {
+            sRight.Reset();
+            CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(),
+                                     sLeft.ConvertToDirect(true), sLeft);
+        }
+        else
+        {
+            CodeGenHelpers::Emit<OP>(tree.GetCodeGenerator(),
+                                     sLeft.ConvertToDirect(true), sRight);
+        }
         return sLeft;
     }
 

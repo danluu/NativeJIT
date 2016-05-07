@@ -556,7 +556,8 @@ namespace NativeJIT
         // and offset to the output stream.
         void Print(std::ostream& out) const;
 
-        bool operator==(Storage<T>const& other) const {
+        template <typename U>
+        bool operator==(Storage<U>const& other) const {
             return this->m_data == other.m_data;
         }
 
@@ -588,7 +589,6 @@ namespace NativeJIT
 
         ExpressionTree::Data* m_data;
     };
-
 
     template <typename T>
     using Storage = typename ExpressionTree::Storage<T>;
