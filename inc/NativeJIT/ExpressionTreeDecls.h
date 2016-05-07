@@ -557,9 +557,7 @@ namespace NativeJIT
         void Print(std::ostream& out) const;
 
         template <typename U>
-        bool operator==(Storage<U>const& other) const {
-            return this->m_data == other.m_data;
-        }
+        bool operator==(Storage<U> const & other) const;
 
 
     private:
