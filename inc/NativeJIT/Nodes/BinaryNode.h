@@ -27,7 +27,6 @@
 #include "NativeJIT/CodeGenHelpers.h"
 #include "NativeJIT/Nodes/Node.h"
 
-#include <type_traits>
 
 namespace NativeJIT
 {

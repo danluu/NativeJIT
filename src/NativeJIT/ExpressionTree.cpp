@@ -43,7 +43,7 @@ namespace NativeJIT
         : m_allocator(allocator),
           m_stlAllocator(allocator),
           m_code(code),
-          m_diagnosticsStream(&std::cout),
+          m_diagnosticsStream(nullptr),
           // Note: there is a member initialization order dependency on
           // m_stlAllocator for multiple members below.
           m_topologicalSort(m_stlAllocator),
