@@ -215,6 +215,7 @@ namespace NativeJIT
 
             bool IsAvailable(unsigned id) const;
 
+            template <bool ISFLOAT>
             unsigned Allocate();
 
             void Allocate(unsigned id);

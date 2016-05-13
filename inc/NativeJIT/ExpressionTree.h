@@ -406,7 +406,7 @@ namespace NativeJIT
     Storage<T> ExpressionTree::Storage<T>::ForAnyFreeRegister(ExpressionTree& tree)
     {
         auto & freeList = FreeListForType<T>::Get(tree);
-        Storage<T>::DirectRegister r(freeList.Allocate());
+        Storage<T>::DirectRegister r(freeList.Allocate<T>());
 
         Data* data = &tree.PlacementConstruct<Data>(tree, r);
 
@@ -967,17 +967,19 @@ namespace NativeJIT
     }
 
 
-    template <unsigned SIZE>
-    unsigned ExpressionTree::FreeList<SIZE>::Allocate()
+    template <unsigned SIZE, bool ISFLOAT>
+    unsigned ExpressionTree::FreeList<SIZE>::Allocate<ISFLOAT>()
     {
         unsigned id;
 
-        const bool registerFound = BitOp::GetHighestBitSet(GetFreeMask(), &id);
+        const bool volatileRegisterFound = BitOp::GetLowestBitSet(GetFreeMask(), &id);
+        const bool nonvolatileRegisterFound = BitOp::GetLowestBitSet(GetFreeMask(), &id);
+        const bool registerFound = volatileRegisterFound || nonvolatileRegisterFound;
         LogThrowAssert(registerFound, "No free registers available");
 
         Allocate(id);
 
-        return id;
+        return registerFound;
     }
 
 
