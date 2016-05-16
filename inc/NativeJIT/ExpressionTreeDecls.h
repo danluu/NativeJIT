@@ -244,6 +244,7 @@ namespace NativeJIT
             // Returns the bit-mask for used and allocated registers.
             unsigned GetUsedMask() const;
             unsigned GetFreeMask() const;
+            unsigned GetFreeMask(bool isVolatile) const;
 
             // Returns a register mask specifying which registers were touched
             // at any point of time, regardless of whether they were later

@@ -35,6 +35,7 @@
 #include <iostream>     // Debugging output.
 
 #include "NativeJIT/BitOperations.h"
+#include "NativeJIT/CodeGen/CallingConvention.h"
 #include "NativeJIT/CodeGenHelpers.h"
 #include "NativeJIT/TypePredicates.h"
 #include "Temporary/AllocatorOperations.h"
@@ -972,15 +973,18 @@ namespace NativeJIT
     {
         unsigned id;
 
-        // const bool volatileRegisterFound = BitOp::GetHighestBitSet(GetFreeMask(), &id);
-        // const bool nonvolatileRegisterFound = BitOp::GetLowestBitSet(GetFreeMask(), &id);
-        //const bool registerFound = volatileRegisterFound || nonvolatileRegisterFound;
-        const bool registerFound = BitOp::GetHighestBitSet(GetFreeMask(), &id);
-        LogThrowAssert(registerFound, "No free registers available");
+        const bool volatileRegisterFound = BitOp::GetHighestBitSet(GetFreeMask(true), &id);
+        if (volatileRegisterFound)
+        {
+            Allocate(id);
+            return id;
+        }
+
+        const bool nonvolatileRegisterFound = BitOp::GetHighestBitSet(GetFreeMask(false), &id);
+        LogThrowAssert(nonvolatileRegisterFound, "No free registers available");
 
         Allocate(id);
-
-        return registerFound;
+        return id;
     }
 
 
@@ -1055,7 +1059,6 @@ namespace NativeJIT
         return m_usedMask;
     }
 
-
     template <unsigned SIZE, bool ISFLOAT>
     unsigned ExpressionTree::FreeList<SIZE, ISFLOAT>::GetLifetimeUsedMask() const
     {
@@ -1067,6 +1070,40 @@ namespace NativeJIT
     unsigned ExpressionTree::FreeList<SIZE, ISFLOAT>::GetFreeMask() const
     {
         return ~m_usedMask & c_fullUsedMask;
+    }
+
+
+    template <unsigned SIZE, bool ISFLOAT>
+    unsigned ExpressionTree::FreeList<SIZE, ISFLOAT>::GetFreeMask(bool isVolatile) const
+    {
+
+#pragma warning(suppress:4127)
+        if (ISFLOAT == true) 
+        {
+            if (isVolatile)
+            {
+                return ~m_usedMask & c_fullUsedMask
+                        & CallingConvention::c_xmmVolatileRegistersMask;
+            }
+            else
+            {
+                return ~m_usedMask & c_fullUsedMask
+                        & CallingConvention::c_xmmNonvolatileRegistersMask;
+            }
+        }
+        else
+        {
+            if (isVolatile)
+            {
+                return ~m_usedMask & c_fullUsedMask
+                        & CallingConvention::c_rxxVolatileRegistersMask;
+            }
+            else
+            {
+                return ~m_usedMask & c_fullUsedMask
+                        & CallingConvention::c_rxxNonvolatileRegistersMask;
+            }
+        }
     }
 
 
