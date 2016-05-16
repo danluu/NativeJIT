@@ -49,6 +49,13 @@ int main()
     Allocator allocator(8192);
     FunctionBuffer code(codeAllocator, 8192);
 
+    // Simple debug test: if this is checked in to master, that's a bug!
+    Function<float, float> expression(allocator, code);
+    auto & imm = expression.Add(expression.GetP1(), expression.GetP1());
+    auto function = expression.Compile(imm);
+    function(10.0);
+/*
+
     // Create the factory for expression nodes.
     // Our area expression will take a single float parameter and return a float.
     Function<float, float> expression(allocator, code);
@@ -67,6 +74,8 @@ int main()
     float radius = 2.0;
     std::cout << "The area of a circle with radius " << radius
               << " is " << function(radius) << "." << std::endl;
+
+*/
 
     return 0;
 }
