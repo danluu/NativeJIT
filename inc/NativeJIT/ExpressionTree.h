@@ -919,8 +919,8 @@ namespace NativeJIT
             CallingConvention::c_xmmVolatileRegistersMask :
             CallingConvention::c_rxxVolatileRegistersMask),
           m_nonVolatileRegisterMask(ISFLOAT ?
-            CallingConvention::c_xmmNonvolatileRegistersMask :
-            CallingConvention::c_rxxNonvolatileRegistersMask),
+            CallingConvention::c_xmmNonVolatileRegistersMask :
+            CallingConvention::c_rxxNonVolatileRegistersMask),
           m_data(),
           m_allocatedRegisters(Allocators::StlAllocator<uint8_t>(allocator)),
           m_pinCount()
@@ -981,7 +981,7 @@ namespace NativeJIT
         unsigned id;
 
         const bool volatileRegisterFound = BitOp::GetHighestBitSet(
-            ~m_usedMask & c_fullUsedMask & m_volatileRegisterMask, &id);
+            ~m_usedMask & m_volatileRegisterMask, &id);
         if (volatileRegisterFound)
         {
             Allocate(id);
@@ -990,7 +990,7 @@ namespace NativeJIT
         else
         {
             const bool nonVolatileRegisterFound = BitOp::GetHighestBitSet(
-                ~m_usedMask & c_fullUsedMask & m_nonVolatileRegisterMask, &id);
+                ~m_usedMask & m_nonVolatileRegisterMask, &id);
             LogThrowAssert(nonVolatileRegisterFound, "No free registers available");
 
             Allocate(id);

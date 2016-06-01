@@ -164,14 +164,14 @@ namespace NativeJIT
             // in memory and returns the pointer to the start of that code.
             // No unwind information is necessary since the function doesn't
             // touch the stack/call any other functions.
-            void (*EmitSaveNonvolatilesCode(FunctionBuffer & code,
+            void (*EmitSaveNonVolatilesCode(FunctionBuffer & code,
                                             RegInfo const & regInfo))()
             {
                 auto functionStart = reinterpret_cast<void (*)()>(code.BufferStart()
                                                                   + code.CurrentPosition());
 
                 // Save all nonvolatiles.
-                unsigned regMask = c_rxxWritableNonvolatilesMask;
+                unsigned regMask = c_rxxWritableNonVolatilesMask;
                 unsigned regId;
 
                 // Using RAX as a scratch register.
@@ -186,7 +186,7 @@ namespace NativeJIT
                 }
 
                 // Do the same for XMM registers.
-                regMask = c_xmmWritableNonvolatilesMask;
+                regMask = c_xmmWritableNonVolatilesMask;
 
                 while (BitOp::GetLowestBitSet(regMask, &regId))
                 {
@@ -243,11 +243,11 @@ namespace NativeJIT
             }
 
 
-            static const unsigned c_rxxWritableNonvolatilesMask
-                = CallingConvention::c_rxxNonvolatileRegistersMask
+            static const unsigned c_rxxWritableNonVolatilesMask
+                = CallingConvention::c_rxxNonVolatileRegistersMask
                   & CallingConvention::c_rxxWritableRegistersMask;
-            static const unsigned c_xmmWritableNonvolatilesMask
-                = CallingConvention::c_xmmNonvolatileRegistersMask
+            static const unsigned c_xmmWritableNonVolatilesMask
+                = CallingConvention::c_xmmNonVolatileRegistersMask
                   & CallingConvention::c_xmmWritableRegistersMask;
 
             // Random number generator. Note: any default seed is acceptable, even if constant.
@@ -553,8 +553,8 @@ namespace NativeJIT
             FunctionSpecification spec(setup->GetAllocator(),
                                         -1,
                                         12, // Stack slots
-                                        c_rxxWritableNonvolatilesMask,
-                                        c_xmmWritableNonvolatilesMask,
+                                        c_rxxWritableNonVolatilesMask,
+                                        c_xmmWritableNonVolatilesMask,
                                         FunctionSpecification::BaseRegisterType::Unused,
                                         GetDiagnosticsStream());
             ASSERT_NO_FATAL_FAILURE(ValidateUnwindInfo(spec));
@@ -615,15 +615,15 @@ namespace NativeJIT
             auto setup = GetSetup();
             auto & code = setup->GetCode();
 
-            void (*saveBeforeFunc)() = EmitSaveNonvolatilesCode(code, before);
-            void (*saveAfterFunc)() = EmitSaveNonvolatilesCode(code, after);
+            void (*saveBeforeFunc)() = EmitSaveNonVolatilesCode(code, before);
+            void (*saveAfterFunc)() = EmitSaveNonVolatilesCode(code, after);
 
             // A function that perserves all non-volatiles.
             FunctionSpecification spec(setup->GetAllocator(),
                                         -1,
                                         12, // Allocate some slots to increase entropy.
-                                        c_rxxWritableNonvolatilesMask,
-                                        c_xmmWritableNonvolatilesMask,
+                                        c_rxxWritableNonVolatilesMask,
+                                        c_xmmWritableNonVolatilesMask,
                                         FunctionSpecification::BaseRegisterType::Unused,
                                         GetDiagnosticsStream());
             ASSERT_NO_FATAL_FAILURE(ValidateUnwindInfo(spec));
@@ -645,7 +645,7 @@ namespace NativeJIT
             saveAfterFunc();
 
             // Verify whether nonvolatiles in before and after storages are the same.
-            unsigned regMask = c_rxxWritableNonvolatilesMask;
+            unsigned regMask = c_rxxWritableNonVolatilesMask;
             unsigned regId;
 
             while (BitOp::GetLowestBitSet(regMask, &regId))
@@ -656,7 +656,7 @@ namespace NativeJIT
                 BitOp::ClearBit(&regMask, regId);
             }
 
-            regMask = c_xmmWritableNonvolatilesMask;
+            regMask = c_xmmWritableNonVolatilesMask;
 
             while (BitOp::GetLowestBitSet(regMask, &regId))
             {
