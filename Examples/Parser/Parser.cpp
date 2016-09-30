@@ -524,9 +524,9 @@ bool Test()
     };
 
 
-    ExecutionBuffer codeAllocator(8192);
-    Allocator allocator(8192);
-    FunctionBuffer code(codeAllocator, 8192);
+    ExecutionBuffer codeAllocator(8192*256);
+    Allocator allocator(8192*256);
+    FunctionBuffer code(codeAllocator, 8192*256);
 
     bool success = true;
     for (size_t i = 0; i < sizeof(cases) / sizeof(TestCase); ++i)
@@ -542,16 +542,16 @@ bool Test()
 
 int main()
 {
-    std::cout << "Running test cases ..." << std::endl;
-    bool success = Test();
-    if (success)
-    {
-        std::cout << "All tests succeeded." << std::endl;
-    }
-    else
-    {
-        std::cout << "One or more tests failed." << std::endl;
-    }
+    // std::cout << "Running test cases ..." << std::endl;
+    // bool success = Test();
+    // if (success)
+    // {
+    //     std::cout << "All tests succeeded." << std::endl;
+    // }
+    // else
+    // {
+    //     std::cout << "One or more tests failed." << std::endl;
+    // }
 
     std::cout << std::endl;
     std::cout << "Type an expression and press return to evaluate." << std::endl;
