@@ -2,10 +2,10 @@
 
 set(CPPFILES
   BitOperationsTest.cpp
-  CodeGenTest.cpp
-  FunctionBufferTest.cpp
-  InstructionEncodingTest.cpp
-  ML64Verifier.cpp
+  # CodeGenTest.cpp
+  # FunctionBufferTest.cpp
+  # InstructionEncodingTest.cpp
+  # ML64Verifier.cpp
   )
 
 set(PRIVATE_HFILES

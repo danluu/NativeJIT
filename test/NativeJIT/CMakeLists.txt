@@ -1,15 +1,15 @@
 # NativeJIT/test/NativeJITTest
 
 set(CPPFILES
-  BitFunnelAcceptanceTest.cpp
-  CastTest.cpp
-  ConditionalTest.cpp
-  ConditionalAutoGenTest.cpp
-  ExpressionTreeTest.cpp
+  # BitFunnelAcceptanceTest.cpp
+  # CastTest.cpp
+  # ConditionalTest.cpp
+  # ConditionalAutoGenTest.cpp
+  # ExpressionTreeTest.cpp
   FloatingPointTest.cpp
-  FunctionTest.cpp
-  PackedTest.cpp
-  UnsignedTest.cpp
+  # FunctionTest.cpp
+  # PackedTest.cpp
+  # UnsignedTest.cpp
 )
 
 set(PRIVATE_HFILES
