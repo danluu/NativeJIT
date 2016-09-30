@@ -114,6 +114,11 @@ namespace Examples
         // Current position of parser in the m_src.
         size_t m_currentPosition;
 
+        // Maximum allowed length. We have this so that our fuzzer doesn't
+        // introduce expressions that are so long that they cause us to blow out
+        // our fixed-length allocation.
+        size_t m_maxPosition;
+
         // NativeJIT Function used to build and compile parsed expression.
         Function<float> m_expression;
     };
@@ -124,6 +129,7 @@ namespace Examples
                    FunctionBuffer& code)
         : m_src(src),
           m_currentPosition(0),
+          m_maxPosition(64),
           m_expression(allocator, code)
     {
     }
@@ -384,6 +390,10 @@ namespace Examples
         if (result != '\0')
         {
             ++m_currentPosition;
+            if (m_currentPosition > m_maxPosition)
+            {
+                throw ParseError("Exceeded maximum expression length.", m_currentPosition);
+            }
         }
         return result;
     }
@@ -524,9 +534,9 @@ bool Test()
     };
 
 
-    ExecutionBuffer codeAllocator(8192*256);
-    Allocator allocator(8192*256);
-    FunctionBuffer code(codeAllocator, 8192*256);
+    ExecutionBuffer codeAllocator(8192);
+    Allocator allocator(8192);
+    FunctionBuffer code(codeAllocator, 8192);
 
     bool success = true;
     for (size_t i = 0; i < sizeof(cases) / sizeof(TestCase); ++i)
